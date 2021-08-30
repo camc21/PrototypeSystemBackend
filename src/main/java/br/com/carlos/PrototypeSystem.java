@@ -8,10 +8,10 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @EnableAutoConfiguration
 @ComponentScan
-public class ProjetoTesteApplication {
+public class PrototypeSystem {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProjetoTesteApplication.class, args);
+		SpringApplication.run(PrototypeSystem.class, args);
 		
 //		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(16);
 //		String result = bCryptPasswordEncoder.encode("admin123");
