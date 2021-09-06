@@ -1,7 +1,5 @@
 package br.com.carlos.controller;
 
-import static org.springframework.http.ResponseEntity.ok;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,11 +10,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.carlos.exception.ErrorHandler.ExceptionRestResponse;
 import br.com.carlos.repository.LoginRepository;
 import br.com.carlos.security.AccountCredentialsVO;
 import br.com.carlos.security.jwt.JwtTokenProvider;
@@ -39,7 +40,7 @@ public class AuthController {
 	public ResponseEntity signin(@RequestBody AccountCredentialsVO data) {
 		
 		try {
-			var username = data.getUsername();
+			var username =data.getUsername();
 			var password = data.getPassword();
 
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -58,11 +59,19 @@ public class AuthController {
 			model.put("username", username);
 			model.put("token", token);
 			
-			return ok(model);
+			return ResponseEntity.ok().body(model);
 
-		} catch (Exception e) {
-			System.out.println(e);
-			return ResponseEntity.ok(HttpStatus.UNAUTHORIZED);
+		} catch (BadCredentialsException bc) {
+			System.out.println(bc);
+			return ResponseEntity.ok().body(new ExceptionRestResponse(HttpStatus.UNAUTHORIZED.value(), bc.getMessage()));
 		}
+	}
+	
+	@GetMapping(value = "/validateToken")
+	public boolean validateToken(@RequestParam String token){
+		String[] tokenTratado = token.split(" ");
+		Boolean retorno = jwtTokenProvider.isTokenValid(tokenTratado[1]);
+		return retorno;
+		
 	}
 }
