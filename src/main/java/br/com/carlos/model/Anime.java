@@ -37,6 +37,13 @@ public class Anime implements Serializable {
 	@Column(name = "possui_manga")
     private Boolean possuiManga;
 	
+	private Anime(Builder builder) {
+		this.idAnime = builder.idAnime;
+		this.nome = builder.nome;
+		this.temporada = builder.temporada;
+		this.possuiManga = builder.possuiManga;
+	}
+	
 	
 	public Anime(AnimeDTO animeDto) {
 		this.idAnime = animeDto.getIdAnime();
@@ -50,5 +57,45 @@ public class Anime implements Serializable {
 		this.temporada = animeDto.getTemporada();
 		this.possuiManga = animeDto.getPossuiManga();
 		return this;
+	}
+	
+	public Anime(Long idAnime, String nome) {
+		this.idAnime = idAnime;
+		this.nome = nome;
+	}
+	
+	public static class Builder {
+	    private Long idAnime;
+		
+	    private String nome;
+		
+	    private Short temporada;
+		
+	    private Boolean possuiManga;
+	    
+	    public Builder idAnime(Long idAnime) {
+	    	this.idAnime = idAnime;
+	    	return this;
+	    }
+	    
+	    public Builder nome(String nome) {
+	    	this.nome = nome;
+	    	return this;
+	    }
+	    
+	    public Builder temporada(Short temporada) {
+	    	this.temporada = temporada;
+	    	return this;
+	    }
+	    
+	    public Builder possuiManga(Boolean possuiManga) {
+	    	this.possuiManga = possuiManga;
+	    	return this;
+	    }
+	    
+	    public Anime build() {
+	    	return new Anime(this);
+	    }
+	    
 	}
 }

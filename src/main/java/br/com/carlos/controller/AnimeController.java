@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.carlos.dto.AnimeDTO;
 import br.com.carlos.model.Anime;
+import br.com.carlos.record.AnimeRecord;
 import br.com.carlos.service.AnimeService;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -26,23 +27,24 @@ public class AnimeController {
     @Autowired
     private AnimeService animeService;
     
+    public record Listagem(List<Anime> animes, long quantidade) {}
     @GetMapping()
-    public ResponseEntity<List<Anime>> findAll() {
+    public ResponseEntity<Listagem> findAll() {
         List<Anime> animeList = animeService.findAll();
-        return animeList != null ? ResponseEntity.ok().body(animeList) : ResponseEntity.notFound().build(); 
+        return animeList != null ? ResponseEntity.ok().body(new Listagem(animeList, animeList.size())) : ResponseEntity.notFound().build(); 
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Anime> findById(@PathVariable Long id) {
         Anime anime = animeService.findById(id);
-        return anime != null ? ResponseEntity.ok().body(anime) : ResponseEntity.notFound().build(); 
+        return ResponseEntity.ok().body(anime); 
     }
     
     @Transactional
     @PostMapping
 //    @PreAuthorize("hasRole('ADMIN')")
-    public void postAnime(@RequestBody AnimeDTO animeDto) {
-    	animeService.postAnime(animeDto);
+    public void postAnime(@RequestBody AnimeRecord animeRecord) {
+    	animeService.postAnime(animeRecord);
     }
     
     @Transactional
