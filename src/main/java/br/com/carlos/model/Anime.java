@@ -46,7 +46,7 @@ public class Anime implements Serializable {
 	
 	
 	public Anime(AnimeDTO animeDto) {
-		this.id = animeDto.getIdAnime();
+		this.id = animeDto.getId();
 		this.nome = animeDto.getNome();
 		this.temporada = animeDto.getTemporada();
 		this.possuiManga = animeDto.getPossuiManga();

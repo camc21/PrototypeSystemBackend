@@ -2,7 +2,6 @@ package br.com.carlos.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -16,9 +15,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import br.com.carlos.dto.LoginDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "login")
-public class Login implements UserDetails, Serializable {
+public class Login implements Serializable {
 
 
 	private static final long serialVersionUID = 1L;
@@ -69,41 +65,6 @@ public class Login implements UserDetails, Serializable {
 			roles.add(ap.getNome());
 		}
 		return roles;
-	}
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.accessProfiles;
-	}
-
-	@Override
-	public String getPassword() {
-		return this.password;
-	}
-
-	@Override
-	public String getUsername() {
-		return this.userName;
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return accountNonExpired;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return accountNonLocked;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return credentialsNonExpired;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return enabled;
 	}
 
 	public Login(Long id, String userName, String password, String description) {

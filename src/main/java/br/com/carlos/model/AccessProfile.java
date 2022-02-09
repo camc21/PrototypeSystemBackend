@@ -11,8 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "access_profile")
-public class AccessProfile implements GrantedAuthority, Serializable {
+public class AccessProfile implements Serializable {
 
 	
 	private static final long serialVersionUID = 1L;
@@ -40,11 +38,6 @@ public class AccessProfile implements GrantedAuthority, Serializable {
 	
 	@OneToMany(mappedBy = "accessProfile")
     private List<AccessProfileHasFunctionalities> accessProfileHasFunctionalities;
-
-	@Override
-	public String getAuthority() {
-		return this.nome;
-	}
 	
 	public AccessProfile(String description) {
 		this.description = description;

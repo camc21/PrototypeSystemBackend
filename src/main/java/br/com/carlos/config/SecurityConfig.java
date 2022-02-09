@@ -16,7 +16,7 @@ import br.com.carlos.security.jwt.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
@@ -44,9 +44,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
 		.authorizeRequests()
-		.antMatchers("/auth/signin", "/api-docs/**", "swagger-ui.html**").permitAll()
 		.antMatchers("/api/**").authenticated()
 		.antMatchers("/users").denyAll()
+		.antMatchers("/auth/signin", "/api-docs/**", "swagger-ui.html**").permitAll()
+//		.anyRequest().authenticated()
 		.and()
 		.apply(new JwtConfigurer(tokenProvider));
 	}

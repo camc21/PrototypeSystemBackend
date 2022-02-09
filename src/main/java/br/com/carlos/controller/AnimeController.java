@@ -1,5 +1,6 @@
 package br.com.carlos.controller;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class AnimeController {
     private AnimeService animeService;
     
     public record Listagem(List<Anime> animes, long quantidade) {}
+    
     @GetMapping()
     public ResponseEntity<Listagem> findAll() {
         List<Anime> animeList = animeService.findAll();
@@ -36,27 +38,26 @@ public class AnimeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Anime> findById(@PathVariable Long id) {
-        Anime anime = animeService.findById(id);
-        return ResponseEntity.ok().body(anime); 
+    	Optional<Anime> anime = animeService.findById(id);
+        return ResponseEntity.ok().body(anime.get()); 
     }
     
     @Transactional
     @PostMapping
-//    @PreAuthorize("hasRole('ADMIN')")
     public void postAnime(@RequestBody AnimeRecord animeRecord) {
-    	animeService.postAnime(animeRecord);
+    	animeService.save(animeRecord);
     }
     
     @Transactional
     @PutMapping
     public void putAnime(@RequestBody AnimeDTO animeDto) {
-    	animeService.putAnime(animeDto);
+    	animeService.update(animeDto);
     }
     
     @Transactional
     @DeleteMapping("/{id}")
     public void deleteAnime(Long id) {
-    	animeService.deleteAnime(id);
+    	animeService.delete(id);
     }
 
 }

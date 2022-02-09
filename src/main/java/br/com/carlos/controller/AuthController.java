@@ -58,11 +58,9 @@ public class AuthController {
 			Map<Object, Object> model = new HashMap<>();
 			model.put("username", username);
 			model.put("token", token);
-			
 			return ResponseEntity.ok().body(model);
 
 		} catch (BadCredentialsException bc) {
-			System.out.println(bc);
 			return ResponseEntity.ok().body(new ExceptionRestResponse(HttpStatus.UNAUTHORIZED.value(), bc.getMessage()));
 		}
 	}
