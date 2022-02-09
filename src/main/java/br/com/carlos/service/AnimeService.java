@@ -22,10 +22,10 @@ public class AnimeService {
 	
 	public List<Anime> findAll(){
 		List<Anime> animeList = animeRepository.findAll();
-		Anime anime = new Anime.Builder().idAnime(1l).nome("Demon Slayer").temporada((short) 1).possuiManga(true).build();
-		AnimeRecord anime2 = new AnimeRecord.Builder().idAnime(1L).nome("Demon Slayer2").temporada((short) 2).possuiManga(true).build();
-		System.out.println(anime);
-		System.out.println(anime2);
+//		Anime anime = new Anime.Builder().idAnime(1l).nome("Demon Slayer").temporada((short) 1).possuiManga(true).build();
+//		AnimeRecord anime2 = new AnimeRecord.Builder().idAnime(1L).nome("Demon Slayer2").temporada((short) 2).possuiManga(true).build();
+//		System.out.println(anime);
+//		System.out.println(anime2);
 		if(!animeList.isEmpty()) {
 			return animeList;
 		}

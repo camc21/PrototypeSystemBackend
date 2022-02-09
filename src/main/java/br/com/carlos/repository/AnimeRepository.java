@@ -4,11 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import br.com.carlos.model.Anime;
+import feign.Param;
 
 public interface AnimeRepository extends JpaRepository<Anime, Long> {
 	
-	@Query("select new Anime(a.idAnime, a.nome)"
-	+ " from Anime a"
-	+ " where a.idAnime = :idAnime")
-	public Anime buscaAnimePorId(Long idAnime);
+	@Query("SELECT new Anime(a.id, a.nome)"
+	+ " FROM Anime a"
+	+ " WHERE a.id = :idAnime")
+	public Anime buscaAnimePorId(@Param("idAnime") Long idAnime);
 }

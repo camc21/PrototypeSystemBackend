@@ -15,7 +15,7 @@ public class LoginDTO implements Serializable {
 
 	private static final long serialVersionUID = -8688877898912248790L;
 
-	private Long idLogin;
+	private Long id;
 
 	private String username;
 
@@ -23,8 +23,8 @@ public class LoginDTO implements Serializable {
 	
 	private List<String> permissions;
 	
-	public LoginDTO(Long idLogin, String userName, String password, String description) {
-		this.idLogin = idLogin;
+	public LoginDTO(Long id, String userName, String password, String description) {
+		this.id = id;
 		this.username = userName;
 		this.password = password;
 		List<String> permissions = new ArrayList<>();

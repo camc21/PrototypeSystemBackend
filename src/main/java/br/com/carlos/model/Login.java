@@ -31,18 +31,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "login")
 public class Login implements UserDetails, Serializable {
 
-	private static final long serialVersionUID = -213864562139748411L;
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_login")
-	private Long idLogin;
+	@Column(name = "id")
+	private Long id;
 
 	@Column(name = "user_name", unique = true)
 	private String userName;
-
-	@Column(name = "full_name")
-	private String fullName;
 
 	@Column(name = "password")
 	private String password;
@@ -60,21 +58,22 @@ public class Login implements UserDetails, Serializable {
 	private Boolean enabled;
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "login_permission", joinColumns = { @JoinColumn(name = "id_login") }, inverseJoinColumns = {
-			@JoinColumn(name = "id_permission") })
-	private List<Permission> permissions;
-	
-	public List<String> getRoles(){
+	@JoinTable(name = "login_has_access_profile", joinColumns = {
+	@JoinColumn(name = "login_id") }, inverseJoinColumns = { 
+	@JoinColumn(name = "access_profile_id") })
+	private List<AccessProfile> accessProfiles;
+
+	public List<String> getRoles() {
 		List<String> roles = new ArrayList<String>();
-		for (Permission p : this.permissions) {
-			roles.add(p.getDescription());
+		for (AccessProfile ap : this.accessProfiles) {
+			roles.add(ap.getNome());
 		}
 		return roles;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.permissions;
+		return this.accessProfiles;
 	}
 
 	@Override
@@ -106,25 +105,25 @@ public class Login implements UserDetails, Serializable {
 	public boolean isEnabled() {
 		return enabled;
 	}
-	
-	public Login(Long idLogin, String userName, String password, String description) {
-		this.idLogin = idLogin;
+
+	public Login(Long id, String userName, String password, String description) {
+		this.id = id;
 		this.userName = userName;
 		this.password = password;
-		List<Permission> permissions = new ArrayList<>();
-		permissions.add(new Permission(description));
-		this.permissions = permissions;
+		List<AccessProfile> accessProfiles = new ArrayList<>();
+		accessProfiles.add(new AccessProfile(description));
+		this.accessProfiles = accessProfiles;
 	}
-	
+
 	public Login(LoginDTO loginDto) {
-		this.idLogin = loginDto.getIdLogin();
+		this.id = loginDto.getId();
 		this.userName = loginDto.getUsername();
 		this.password = loginDto.getPassword();
-		List<Permission> permissions = new ArrayList<>();
-		for (String permissionDto : loginDto.getPermissions()) {
-			permissions.add(new Permission(permissionDto));
+		List<AccessProfile> accessProfiles = new ArrayList<>();
+		for (String descriptionProfile : loginDto.getPermissions()) {
+			accessProfiles.add(new AccessProfile(descriptionProfile));
 		}
-		this.permissions = permissions;
+		this.accessProfiles = accessProfiles;
 	}
 
 }

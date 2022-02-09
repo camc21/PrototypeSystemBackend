@@ -6,33 +6,28 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import br.com.carlos.model.Login;
-import br.com.carlos.model.Permission;
+import br.com.carlos.model.AccessProfile;
 import feign.Param;
 
 public interface LoginRepository extends JpaRepository<Login, Long> {
 	
-	@Query("select l from Login l where l.userName = :userName")
+	@Query("SELECT l"
+			+ " FROM Login l"
+			+ " WHERE l.userName = :userName")
 	Login findByUserName(@Param("userName") String userName);
 	
-	@Query("select"
-			+ " new br.com.carlos.model.Permission(p.description)"
-			+ " from Login l"
-			+ " inner join l.permissions p"
-			+ " where l.idLogin = :idLogin")
-	List<Permission> findRolesByIdLogin(@Param("idLogin") Long idLogin);
-	
-//	@Query("SELECT"
-//			+ " new br.com.carlos.dto.LoginDTO(l.idLogin, l.userName, l.password, p.description)"
-//			+ "	FROM Login l"
-//			+ " inner join l.permissions p"
-//			+ " WHERE l.idLogin = :idLogin")
-//	LoginDTO findByUserNameDTO(@Param("idLogin") Long idLogin);
+	@Query("SELECT"
+			+ " new br.com.carlos.model.AccessProfile(ap.description)"
+			+ " FROM Login l"
+			+ " INNER JOIN l.accessProfiles ap"
+			+ " WHERE l.id = :idLogin")
+	List<AccessProfile> findProfilesByIdLogin(@Param("idLogin") Long idLogin);
 	
 	@Query("SELECT"
-			+ " new br.com.carlos.model.Login(l.idLogin, l.userName, l.password, p.description)"
+			+ " new br.com.carlos.model.Login(l.id, l.userName, l.password, ap.description)"
 			+ "	FROM Login l"
-			+ " inner join l.permissions p"
-			+ " WHERE l.idLogin = :idLogin")
+			+ " INNER JOIN l.accessProfiles ap"
+			+ " WHERE l.id = :idLogin")
 	Login findByUserNameDTO(@Param("idLogin") Long idLogin);
 
 }

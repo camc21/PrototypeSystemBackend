@@ -25,8 +25,8 @@ public class Anime implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_anime")
-    private Long idAnime;
+	@Column(name = "id")
+    private Long id;
 	
 	@Column(name = "nome")
     private String nome;
@@ -38,7 +38,7 @@ public class Anime implements Serializable {
     private Boolean possuiManga;
 	
 	private Anime(Builder builder) {
-		this.idAnime = builder.idAnime;
+		this.id = builder.idAnime;
 		this.nome = builder.nome;
 		this.temporada = builder.temporada;
 		this.possuiManga = builder.possuiManga;
@@ -46,7 +46,7 @@ public class Anime implements Serializable {
 	
 	
 	public Anime(AnimeDTO animeDto) {
-		this.idAnime = animeDto.getIdAnime();
+		this.id = animeDto.getIdAnime();
 		this.nome = animeDto.getNome();
 		this.temporada = animeDto.getTemporada();
 		this.possuiManga = animeDto.getPossuiManga();
@@ -60,7 +60,7 @@ public class Anime implements Serializable {
 	}
 	
 	public Anime(Long idAnime, String nome) {
-		this.idAnime = idAnime;
+		this.id = idAnime;
 		this.nome = nome;
 	}
 	
