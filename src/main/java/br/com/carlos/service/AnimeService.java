@@ -23,21 +23,24 @@ public class AnimeService implements InterfaceCrud<Anime, AnimeDTO, AnimeRecord>
 
 	@Override
 	public List<Anime> findAll() {
+
 		List<Anime> animeList = animeRepository.findAll();
-//	Anime anime = new Anime.Builder().idAnime(1l).nome("Demon Slayer").temporada((short) 1).possuiManga(true).build();
-//	AnimeRecord anime2 = new AnimeRecord.Builder().idAnime(1L).nome("Demon Slayer2").temporada((short) 2).possuiManga(true).build();
-//	System.out.println(anime);
-//	System.out.println(anime2);
+//			Anime anime = new Anime.Builder().idAnime(1l).nome("Demon Slayer").temporada((short) 1).possuiManga(true).build();
+//			AnimeRecord anime2 = new AnimeRecord.Builder().idAnime(1L).nome("Demon Slayer2").temporada((short) 2).possuiManga(true).build();
+//			System.out.println(anime);
+//			System.out.println(anime2);
 		if (!animeList.isEmpty()) {
 			return animeList;
 		}
 		return new ArrayList<Anime>();
+
 	}
 
 	@Override
 	public Optional<Anime> findById(Long id) {
 		Optional<Anime> anime = animeRepository.findById(id);
-		return Optional.ofNullable(anime.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anime não encontrado")));
+		return Optional.ofNullable(
+				anime.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anime não encontrado")));
 	}
 
 	@Override
