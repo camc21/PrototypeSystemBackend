@@ -62,7 +62,7 @@ public class Login implements Serializable {
 	public List<String> getRoles() {
 		List<String> roles = new ArrayList<String>();
 		for (AccessProfile ap : this.accessProfiles) {
-			roles.add(ap.getNome());
+			roles.add(ap.getName());
 		}
 		return roles;
 	}

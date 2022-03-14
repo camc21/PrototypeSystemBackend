@@ -12,6 +12,8 @@ public class FunctionalityAccessProfileDTO {
 	private Long accessProfileId;
 
 	private String profileName;
+	
+	private String profileDescription;
 
 	private Long functonalityId;
 

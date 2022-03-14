@@ -21,23 +21,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import br.com.carlos.dto.AnimeDTO;
-import br.com.carlos.model.Anime;
-import br.com.carlos.service.AnimeService;
+import br.com.carlos.dto.UserEntityDTO;
+import br.com.carlos.model.UserEntity;
+import br.com.carlos.service.UserEntityService;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/api/anime")
-public class AnimeController {
+@RequestMapping("/api/userEntity")
+public class UserEntityController {
 
 	@Autowired
-	private AnimeService animeService;
+	private UserEntityService userEntityService;
 
 	@GetMapping()
-	public ResponseEntity<List<Anime>> findAll() {
+	public ResponseEntity<List<UserEntity>> findAll() {
 		try {
-			List<Anime> animeList = animeService.findAll();
-			return ResponseEntity.ok().body(animeList);
+			List<UserEntity> userEntityList = userEntityService.findAll();
+			return ResponseEntity.ok().body(userEntityList);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);
@@ -45,13 +45,13 @@ public class AnimeController {
 	}
 
 	@GetMapping("/page")
-	public ResponseEntity<Page<AnimeDTO>> findAllPage(
+	public ResponseEntity<Page<UserEntityDTO>> findAllPage(
 			@RequestParam(defaultValue = "0") Integer pageNo, 
             @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "nome") String sortBy) {
+            @RequestParam(defaultValue = "name") String sortBy) {
 		try {
-			Page<AnimeDTO> animeList = animeService.findAllPage(pageNo, pageSize, sortBy);
-			return ResponseEntity.ok().body(animeList);
+			Page<UserEntityDTO> userEntityList = userEntityService.findAllPage(pageNo, pageSize, sortBy);
+			return ResponseEntity.ok().body(userEntityList);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);
@@ -59,10 +59,10 @@ public class AnimeController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Anime> findById(@PathVariable Long id) {
+	public ResponseEntity<UserEntity> findById(@PathVariable Long id) {
 		try {
-			Optional<Anime> anime = animeService.findById(id);
-			return ResponseEntity.ok().body(anime.get());
+			Optional<UserEntity> userEntity = userEntityService.findById(id);
+			return ResponseEntity.ok().body(userEntity.get());
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);
@@ -71,9 +71,9 @@ public class AnimeController {
 
 	@Transactional
 	@PostMapping
-	public void postAnime(@RequestBody AnimeDTO animeDto) {
+	public void postUserEntity(@RequestBody UserEntityDTO userEntityDto) {
 		try {
-			animeService.save(animeDto);
+			userEntityService.save(userEntityDto);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);
@@ -82,9 +82,9 @@ public class AnimeController {
 
 	@Transactional
 	@PutMapping
-	public void putAnime(@RequestBody AnimeDTO animeDto) {
+	public void putUserEntity(@RequestBody UserEntityDTO userEntityDto) {
 		try {
-			animeService.update(animeDto);
+			userEntityService.update(userEntityDto);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);
@@ -93,9 +93,9 @@ public class AnimeController {
 
 	@Transactional
 	@DeleteMapping("/{id}")
-	public void deleteAnime(@PathVariable Long id) {
+	public void deleteUserEntity(@PathVariable Long id) {
 		try {
-			animeService.delete(id);
+			userEntityService.delete(id);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);

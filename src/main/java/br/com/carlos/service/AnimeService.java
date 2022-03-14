@@ -17,11 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 import br.com.carlos.dto.AnimeDTO;
 import br.com.carlos.interfaces.InterfaceCrud;
 import br.com.carlos.model.Anime;
-import br.com.carlos.record.AnimeRecord;
 import br.com.carlos.repository.AnimeRepository;
 
 @Service
-public class AnimeService implements InterfaceCrud<Anime, AnimeDTO, AnimeRecord> {
+public class AnimeService implements InterfaceCrud<AnimeDTO> {
 
 	@Autowired
 	AnimeRepository animeRepository;
@@ -29,8 +28,7 @@ public class AnimeService implements InterfaceCrud<Anime, AnimeDTO, AnimeRecord>
 	public record Listagem(List<Anime> animes, long quantidade) {
 	}
 
-	@Override
-	@PreAuthorize("hasAuthority('CADASTRO_ANIME_LEITURA')")
+	@PreAuthorize("hasAuthority('REGISTER_ANIME_READING')")
 	public List<Anime> findAll() {
 		List<Anime> animeList = animeRepository.findAll();
 //			Anime anime = new Anime.Builder().idAnime(1l).nome("Demon Slayer").temporada((short) 1).possuiManga(true).build();
@@ -41,8 +39,7 @@ public class AnimeService implements InterfaceCrud<Anime, AnimeDTO, AnimeRecord>
 		return new ArrayList<Anime>();
 	}
 	
-	@Override
-	@PreAuthorize("hasAuthority('CADASTRO_ANIME_LEITURA')")
+	@PreAuthorize("hasAuthority('REGISTER_ANIME_READING')")
 	public Page<AnimeDTO> findAllPage(Integer pageNo, Integer pageSize, String sortBy) {
 		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 		Page<AnimeDTO> animeList = animeRepository.findAllPage(paging);
@@ -54,8 +51,7 @@ public class AnimeService implements InterfaceCrud<Anime, AnimeDTO, AnimeRecord>
 		return animeList;
 	}
 
-	@Override
-	@PreAuthorize("hasAuthority('CADASTRO_ANIME_LEITURA')")
+	@PreAuthorize("hasAuthority('REGISTER_ANIME_READING')")
 	public Optional<Anime> findById(Long id) {
 		Optional<Anime> anime = animeRepository.findById(id);
 		return Optional.ofNullable(
@@ -63,15 +59,15 @@ public class AnimeService implements InterfaceCrud<Anime, AnimeDTO, AnimeRecord>
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('CADASTRO_ANIME_ESCRITA')")
-	public void save(AnimeRecord animeRecord) {
-		Anime anime = new Anime.Builder().idAnime(animeRecord.idAnime()).nome(animeRecord.nome())
-				.possuiManga(animeRecord.possuiManga()).temporada(animeRecord.temporada()).build();
+	@PreAuthorize("hasAuthority('REGISTER_ANIME_WRITING')")
+	public void save(AnimeDTO animeDto) {
+		Anime anime = new Anime.Builder().idAnime(animeDto.getId()).nome(animeDto.getName())
+				.hasManga(animeDto.getHasManga()).season(animeDto.getSeason()).build();
 		animeRepository.save(anime);
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('CADASTRO_ANIME_ESCRITA')")
+	@PreAuthorize("hasAuthority('REGISTER_ANIME_WRITING')")
 	public void update(AnimeDTO animeDto) {
 		Anime anime = findById(animeDto.getId()).get();
 		anime.updateAnime(animeDto);
@@ -79,7 +75,7 @@ public class AnimeService implements InterfaceCrud<Anime, AnimeDTO, AnimeRecord>
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('CADASTRO_ANIME_ESCRITA')")
+	@PreAuthorize("hasAuthority('REGISTER_ANIME_WRITING')")
 	public void delete(Long id) {
 		animeRepository.deleteById(id);
 	}

@@ -1,49 +1,143 @@
 package br.com.carlos.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import br.com.carlos.dto.AccessProfileDTO;
+import br.com.carlos.dto.ComboBoxDTO;
 import br.com.carlos.dto.FunctionalityAccessProfileDTO;
+import br.com.carlos.dto.FunctionalityPermissionDTO;
+import br.com.carlos.interfaces.InterfaceCrud;
 import br.com.carlos.model.AccessProfile;
+import br.com.carlos.model.AccessProfileHasFunctionality;
+import br.com.carlos.model.Functionality;
 import br.com.carlos.repository.AccessProfileRepository;
-import javassist.tools.rmi.ObjectNotFoundException;
 
 @Service
-public class AccessProfileService {
+public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 
 	@Autowired
 	private AccessProfileRepository accessProfileRepository;
+	
+	@Autowired
+	private AccessProfileHasFunctionalityService accessProfileHasFunctionalityService;
 
-	public AccessProfile findById(Long idProfile) throws ObjectNotFoundException {
-		Optional<AccessProfile> obj = accessProfileRepository.findById(idProfile);
-		return obj.orElseThrow(() -> new ObjectNotFoundException("Perfil não encontrado!"));
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+	public List<AccessProfile> findAll() {
+		List<AccessProfile> accessProfileList = accessProfileRepository.findAll();
+		if (!accessProfileList.isEmpty()) {
+			return accessProfileList;
+		}
+		return new ArrayList<>();
 	}
 
-	public List<Long> findIdsFromFunctionalitiesForIdProfile(Long idPerfil) {
-		return accessProfileRepository.findIdsFromFunctionalitiesForIdProfile(idPerfil);
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+	public Page<AccessProfileDTO> findAllPage(Integer pageNo, Integer pageSize, String sortBy) {
+		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+		Page<AccessProfileDTO> accessProfileList = accessProfileRepository.findAllPage(paging);
+		if (!accessProfileList.isEmpty()) {
+			return accessProfileList;
+		}
+		return null;
 	}
 
-	public List<FunctionalityAccessProfileDTO> retrievePermissionsForIdsProfiles(List<Long> idsPerfis) {
-		return accessProfileRepository.retrievePermissionsForIdsProfiles(idsPerfis);
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+	public Optional<AccessProfileDTO> findById(Long id) {
+		Optional<AccessProfile> accessProfile = accessProfileRepository.findById(id);
+		Optional<AccessProfileDTO> accessProfileDto = Optional.of(new AccessProfileDTO(accessProfile.get()));
+		List<FunctionalityPermissionDTO> findFunctionalityPermissionListDto =  accessProfileHasFunctionalityService.findFunctionalityPermissionListDto(id);
+		accessProfileDto.get().setPermissions(findFunctionalityPermissionListDto);
+		return Optional.ofNullable(accessProfileDto.orElseThrow(
+				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil de Acesso não encontrado")));
 	}
 	
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
 	public List<FunctionalityAccessProfileDTO> retrievePermissionsForIdLogin(Long idLogin) {
 		return accessProfileRepository.retrievePermissionsForIdLogin(idLogin);
 	}
 
-	public boolean profileHasReadPermissionToFunctionalityForFunctionalityNameAndIdProfile(String functionalityName,
-			Long idPerfil) {
-		return accessProfileRepository
-				.profileHasReadPermissionToFunctionalityForFunctionalityNameAndIdProfile(functionalityName, idPerfil);
+	@Override
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_WRITING')")
+	public void save(AccessProfileDTO accessProfileDto) {
+		
+		AccessProfile accessProfile = new AccessProfile();
+		accessProfile.setName(accessProfileDto.getName());
+		accessProfile.setDescription(accessProfileDto.getDescription());
+		List<AccessProfileHasFunctionality> accessProfileHasFunctionalityList = new ArrayList<>();
+		for (int i = 0; i < accessProfileDto.getPermissions().size(); i++) {
+			Functionality functionality = new Functionality(accessProfileDto.getPermissions().get(i).getId());
+			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality(accessProfile, functionality, accessProfileDto.getPermissions().get(i).getReadingPermission(), accessProfileDto.getPermissions().get(i).getWritingPermission());
+			accessProfileHasFunctionalityList.add(accessProfileHasFunctionality);
+		}
+		accessProfile.setAccessProfileHasFunctionalities(accessProfileHasFunctionalityList);
+		accessProfile = accessProfileRepository.save(accessProfile);
+		accessProfileHasFunctionalityService.saveAll(accessProfileHasFunctionalityList);
 	}
 
-	public boolean profileHasWritePermissionToFunctionalityForFunctionalityNameAndIdProfile(String functionalityName,
-			Long idPerfil) {
-		return accessProfileRepository
-				.profileHasWritePermissionToFunctionalityForFunctionalityNameAndIdProfile(functionalityName, idPerfil);
+	@Override
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_WRITING')")
+	public void update(AccessProfileDTO accessProfileDto) {
+		AccessProfile accessProfile = accessProfileRepository.findById(accessProfileDto.getId()).get();
+		accessProfile.setName(accessProfileDto.getName());
+		accessProfile.setDescription(accessProfileDto.getDescription());
+		accessProfile = accessProfileRepository.save(accessProfile);
+		List<AccessProfileHasFunctionality> accessProfileHasFunctionalityList = new ArrayList<>();
+		for (int i = 0; i < accessProfileDto.getPermissions().size(); i++) {
+			Functionality functionality = new Functionality(accessProfileDto.getPermissions().get(i).getId());
+			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality(accessProfile, functionality, accessProfileDto.getPermissions().get(i).getReadingPermission(), accessProfileDto.getPermissions().get(i).getWritingPermission());
+			accessProfileHasFunctionalityList.add(accessProfileHasFunctionality);
+		}
+		accessProfileHasFunctionalityService.saveAll(accessProfileHasFunctionalityList);
 	}
+
+	@Override
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_WRITING')")
+	public void delete(Long id) {
+		accessProfileRepository.deleteById(id);
+	}
+	
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+	public List<ComboBoxDTO> comboBox() {
+		List<ComboBoxDTO> comboBox = accessProfileRepository.comboBox();
+		if (!comboBox.isEmpty()) {
+			return comboBox;
+		}
+		return new ArrayList<>();
+	}
+
+//	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+//	public List<Long> findIdsFromFunctionalitiesForIdProfile(Long idPerfil) {
+//		return accessProfileRepository.findIdsFromFunctionalitiesForIdProfile(idPerfil);
+//	}
+//
+//	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+//	public List<FunctionalityAccessProfileDTO> retrievePermissionsForIdsProfiles(List<Long> idsPerfis) {
+//		return accessProfileRepository.retrievePermissionsForIdsProfiles(idsPerfis);
+//	}
+//
+//	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+//	public boolean profileHasReadPermissionToFunctionalityForFunctionalityNameAndIdProfile(String functionalityName,
+//			Long idPerfil) {
+//		return accessProfileRepository
+//				.profileHasReadPermissionToFunctionalityForFunctionalityNameAndIdProfile(functionalityName, idPerfil);
+//	}
+//
+//	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+//	public boolean profileHasWritePermissionToFunctionalityForFunctionalityNameAndIdProfile(String functionalityName,
+//			Long idPerfil) {
+//		return accessProfileRepository
+//				.profileHasWritePermissionToFunctionalityForFunctionalityNameAndIdProfile(functionalityName, idPerfil);
+//	}
 
 }

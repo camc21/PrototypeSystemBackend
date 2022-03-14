@@ -9,15 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnimeDTO implements Serializable {
+public class UserEntityDTO implements Serializable {
 	
-	private static final long serialVersionUID = -7714603118324524942L;
+	private static final long serialVersionUID = 1L;
 
 	private Long id;
 	
     private String name;
 	
-    private Short season;
-	
-    private Boolean hasManga;
+    private String email;
 }

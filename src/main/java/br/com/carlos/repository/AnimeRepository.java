@@ -14,15 +14,15 @@ import feign.Param;
 
 public interface AnimeRepository extends JpaRepository<Anime, Long> {
 	
-	@Query("SELECT new Anime(a.id, a.nome, a.temporada, a.possuiManga)"
+	@Query("SELECT new Anime(a.id, a.name, a.season, a.hasManga)"
 			+ " FROM Anime a")
 	public List<Anime> findAll();
 	
-	@Query("SELECT new br.com.carlos.dto.AnimeDTO(a.id, a.nome, a.temporada, a.possuiManga)"
+	@Query("SELECT new br.com.carlos.dto.AnimeDTO(a.id, a.name, a.season, a.hasManga)"
 			+ " FROM Anime a")
 	public Page<AnimeDTO> findAllPage(Pageable pageable);
 	
-	@Query("SELECT new Anime(a.id, a.nome)"
+	@Query("SELECT new Anime(a.id, a.name)"
 	+ " FROM Anime a"
 	+ " WHERE a.id = :idAnime")
 	public Optional<Anime> findById(@Param("idAnime") Long idAnime);

@@ -1,6 +1,7 @@
 package br.com.carlos.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -11,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import br.com.carlos.dto.AccessProfileHasFunctionalityDTO;
+import br.com.carlos.dto.FunctionalityDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,12 +33,26 @@ public class Functionality implements Serializable {
 	private Long id;
 	
 	@Column(name = "nome")
-	private String nome;
+	private String name;
 	
 	@OneToMany(mappedBy = "functionality")
-    private List<AccessProfileHasFunctionalities> accessProfileHasFunctionalities;
+    private List<AccessProfileHasFunctionality> accessProfileHasFunctionalities = new ArrayList<>();
+	
+	public Functionality(FunctionalityDTO dto) {
+		Functionality f = new Functionality();
+		f.setId(dto.getId());
+		f.setName(dto.getDescription());
+		for (AccessProfileHasFunctionalityDTO aphfDto : dto.getAccessProfileHasFunctionalitiesDto()) {
+			accessProfileHasFunctionalities.add(new AccessProfileHasFunctionality(new AccessProfile(aphfDto.getAccessProfileDto()),new Functionality(aphfDto.getFunctionalityDto()), aphfDto.getReadPermission(), aphfDto.getWritePermission()));
+		}
+	}
 	
 	public Functionality(Long id) {
 		this.id = id;
+	}
+	
+	public Functionality(Long id, String name) {
+		this.id = id;
+		this.name = name;
 	}
 }

@@ -3,23 +3,25 @@ package br.com.carlos.model;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Embeddable
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class AccessProfileHasFunctionalitiesId implements Serializable{
+@Embeddable
+public class AccessProfileFunctionalityKey implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
+	@Column(name = "access_profile_id")
 	private Long accessProfileId;
 	
+	@Column(name = "functionality_id")
 	private Long functionalityId;
 
 	@Override
@@ -30,7 +32,7 @@ public class AccessProfileHasFunctionalitiesId implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AccessProfileHasFunctionalitiesId other = (AccessProfileHasFunctionalitiesId) obj;
+		AccessProfileFunctionalityKey other = (AccessProfileFunctionalityKey) obj;
 		return Objects.equals(accessProfileId, other.accessProfileId)
 				&& Objects.equals(functionalityId, other.functionalityId);
 	}

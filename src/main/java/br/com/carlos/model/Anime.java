@@ -28,68 +28,68 @@ public class Anime implements Serializable {
 	@Column(name = "id")
     private Long id;
 	
-	@Column(name = "nome")
-    private String nome;
+	@Column(name = "name")
+    private String name;
 	
-	@Column(name = "temporada")
-    private Short temporada;
+	@Column(name = "season")
+    private Short season;
 	
-	@Column(name = "possui_manga")
-    private Boolean possuiManga;
+	@Column(name = "has_manga")
+    private Boolean hasManga;
 	
 	private Anime(Builder builder) {
-		this.id = builder.idAnime;
-		this.nome = builder.nome;
-		this.temporada = builder.temporada;
-		this.possuiManga = builder.possuiManga;
+		this.id = builder.id;
+		this.name = builder.name;
+		this.season = builder.season;
+		this.hasManga = builder.hasManga;
 	}
 	
 	
 	public Anime(AnimeDTO animeDto) {
 		this.id = animeDto.getId();
-		this.nome = animeDto.getNome();
-		this.temporada = animeDto.getTemporada();
-		this.possuiManga = animeDto.getPossuiManga();
+		this.name = animeDto.getName();
+		this.season = animeDto.getSeason();
+		this.hasManga = animeDto.getHasManga();
 	}
 	
 	public Anime updateAnime(AnimeDTO animeDto) {
-		this.nome = animeDto.getNome();
-		this.temporada = animeDto.getTemporada();
-		this.possuiManga = animeDto.getPossuiManga();
+		this.name = animeDto.getName();
+		this.season = animeDto.getSeason();
+		this.hasManga = animeDto.getHasManga();
 		return this;
 	}
 	
-	public Anime(Long idAnime, String nome) {
-		this.id = idAnime;
-		this.nome = nome;
+	public Anime(Long id, String name) {
+		this.id = id;
+		this.name = name;
 	}
 	
 	public static class Builder {
-	    private Long idAnime;
+	    private Long id;
 		
-	    private String nome;
+	    private String name;
 		
-	    private Short temporada;
+	    private Short season;
 		
-	    private Boolean possuiManga;
+	    private Boolean hasManga;
 	    
-	    public Builder idAnime(Long idAnime) {
-	    	this.idAnime = idAnime;
+	    public Builder idAnime(Long id) {
+	    	this.id = id;
 	    	return this;
 	    }
 	    
-	    public Builder nome(String nome) {
-	    	this.nome = nome;
+	    public Builder nome(String name) {
+	    	this.name = name;
 	    	return this;
 	    }
 	    
-	    public Builder temporada(Short temporada) {
-	    	this.temporada = temporada;
+	    public Builder season(Short season) {
+	    	this.season = season;
 	    	return this;
 	    }
 	    
-	    public Builder possuiManga(Boolean possuiManga) {
-	    	this.possuiManga = possuiManga;
+	    public Builder hasManga(Boolean hasManga) {
+	    	this.hasManga = hasManga;
 	    	return this;
 	    }
 	    

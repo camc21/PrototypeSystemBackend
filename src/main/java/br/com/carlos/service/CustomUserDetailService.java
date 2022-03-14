@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import br.com.carlos.model.AccessProfile;
-import br.com.carlos.model.AccessProfileHasFunctionalities;
+import br.com.carlos.model.AccessProfileHasFunctionality;
 import br.com.carlos.model.Login;
 import br.com.carlos.repository.LoginRepository;
 
@@ -43,15 +43,15 @@ public class CustomUserDetailService implements UserDetailsService {
 		List<AccessProfile> accessProfiles = login.getAccessProfiles();
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		for (AccessProfile ap : accessProfiles) {
-			for (AccessProfileHasFunctionalities aphf : ap.getAccessProfileHasFunctionalities()) {
+			for (AccessProfileHasFunctionality aphf : ap.getAccessProfileHasFunctionalities()) {
 				if(aphf.getWritePermission() == Boolean.TRUE) {
-					if(!authorities.contains(new SimpleGrantedAuthority(aphf.getFunctionality().getNome()+"_ESCRITA"))) {
-						authorities.add(new SimpleGrantedAuthority(aphf.getFunctionality().getNome()+"_ESCRITA"));
+					if(!authorities.contains(new SimpleGrantedAuthority(aphf.getFunctionality().getName()+"_WRITING"))) {
+						authorities.add(new SimpleGrantedAuthority(aphf.getFunctionality().getName()+"_WRITING"));
 					}
 				}
 				if(aphf.getReadPermission() == Boolean.TRUE) {
-					if(!authorities.contains(new SimpleGrantedAuthority(aphf.getFunctionality().getNome()+"_LEITURA"))) {
-						authorities.add(new SimpleGrantedAuthority(aphf.getFunctionality().getNome()+"_LEITURA"));
+					if(!authorities.contains(new SimpleGrantedAuthority(aphf.getFunctionality().getName()+"_READING"))) {
+						authorities.add(new SimpleGrantedAuthority(aphf.getFunctionality().getName()+"_READING"));
 					}
 					
 				}

@@ -1,6 +1,8 @@
 package br.com.carlos.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +18,8 @@ public class FunctionalityDTO implements Serializable {
 	private Long id;
 	
 	private String description;
+	
+	 private List<AccessProfileHasFunctionalityDTO> accessProfileHasFunctionalitiesDto = new ArrayList<>();
 	
 	public FunctionalityDTO(Long id) {
 		this.id = id;
