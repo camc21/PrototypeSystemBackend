@@ -28,12 +28,12 @@ public class CustomUserDetailService implements UserDetailsService {
 	LoginRepository loginRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-		final Login login = loginRepository.findByUserName(userName);
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		final Login login = loginRepository.findByEmail(email);
 		if (login == null) {
-			throw new UsernameNotFoundException("UserName " + userName + " not find");
+			throw new UsernameNotFoundException("UserName " + email + " not find");
 		} else {
-			UserDetails user = User.withUsername(login.getUserName()).password(login.getPassword())
+			UserDetails user = User.withUsername(login.getEmail()).password(login.getPassword())
 					.disabled(!login.getEnabled()).authorities(getAuthorities(login)).build();
 			return user;
 		}

@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import br.com.carlos.dto.AccessProfileDTO;
 import br.com.carlos.dto.ComboBoxDTO;
 import br.com.carlos.dto.FunctionalityAccessProfileDTO;
-import br.com.carlos.dto.FunctionalityPermissionDTO;
 import br.com.carlos.interfaces.InterfaceCrud;
 import br.com.carlos.model.AccessProfile;
 import br.com.carlos.model.AccessProfileHasFunctionality;
@@ -46,6 +45,9 @@ public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 	public Page<AccessProfileDTO> findAllPage(Integer pageNo, Integer pageSize, String sortBy) {
 		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 		Page<AccessProfileDTO> accessProfileList = accessProfileRepository.findAllPage(paging);
+		for (AccessProfileDTO ap : accessProfileList) {
+			ap.setPermissions(accessProfileRepository.retrievePermissionsForIdLogin(ap.getId()));
+		}
 		if (!accessProfileList.isEmpty()) {
 			return accessProfileList;
 		}
@@ -56,7 +58,7 @@ public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 	public Optional<AccessProfileDTO> findById(Long id) {
 		Optional<AccessProfile> accessProfile = accessProfileRepository.findById(id);
 		Optional<AccessProfileDTO> accessProfileDto = Optional.of(new AccessProfileDTO(accessProfile.get()));
-		List<FunctionalityPermissionDTO> findFunctionalityPermissionListDto =  accessProfileHasFunctionalityService.findFunctionalityPermissionListDto(id);
+		List<FunctionalityAccessProfileDTO> findFunctionalityPermissionListDto =  accessProfileHasFunctionalityService.findFunctionalityPermissionListDto(id);
 		accessProfileDto.get().setPermissions(findFunctionalityPermissionListDto);
 		return Optional.ofNullable(accessProfileDto.orElseThrow(
 				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil de Acesso não encontrado")));
@@ -76,8 +78,8 @@ public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 		accessProfile.setDescription(accessProfileDto.getDescription());
 		List<AccessProfileHasFunctionality> accessProfileHasFunctionalityList = new ArrayList<>();
 		for (int i = 0; i < accessProfileDto.getPermissions().size(); i++) {
-			Functionality functionality = new Functionality(accessProfileDto.getPermissions().get(i).getId());
-			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality(accessProfile, functionality, accessProfileDto.getPermissions().get(i).getReadingPermission(), accessProfileDto.getPermissions().get(i).getWritingPermission());
+			Functionality functionality = new Functionality(accessProfileDto.getPermissions().get(i).getFunctonalityId());
+			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality(accessProfile, functionality, accessProfileDto.getPermissions().get(i).getReadPermission(), accessProfileDto.getPermissions().get(i).getWritePermission());
 			accessProfileHasFunctionalityList.add(accessProfileHasFunctionality);
 		}
 		accessProfile.setAccessProfileHasFunctionalities(accessProfileHasFunctionalityList);
@@ -94,8 +96,8 @@ public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 		accessProfile = accessProfileRepository.save(accessProfile);
 		List<AccessProfileHasFunctionality> accessProfileHasFunctionalityList = new ArrayList<>();
 		for (int i = 0; i < accessProfileDto.getPermissions().size(); i++) {
-			Functionality functionality = new Functionality(accessProfileDto.getPermissions().get(i).getId());
-			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality(accessProfile, functionality, accessProfileDto.getPermissions().get(i).getReadingPermission(), accessProfileDto.getPermissions().get(i).getWritingPermission());
+			Functionality functionality = new Functionality(accessProfileDto.getPermissions().get(i).getFunctonalityId());
+			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality(accessProfile, functionality, accessProfileDto.getPermissions().get(i).getReadPermission(), accessProfileDto.getPermissions().get(i).getWritePermission());
 			accessProfileHasFunctionalityList.add(accessProfileHasFunctionality);
 		}
 		accessProfileHasFunctionalityService.saveAll(accessProfileHasFunctionalityList);
@@ -114,6 +116,11 @@ public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 			return comboBox;
 		}
 		return new ArrayList<>();
+	}
+	
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
+	public List<ComboBoxDTO> findComboBoxByIdLogin(Long idLogin) {
+		return accessProfileRepository.findComboBoxByIdLogin(idLogin);
 	}
 
 //	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")

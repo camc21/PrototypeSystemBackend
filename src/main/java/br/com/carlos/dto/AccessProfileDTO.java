@@ -23,14 +23,14 @@ public class AccessProfileDTO implements Serializable {
 
 	private String description;
 
-	List<FunctionalityPermissionDTO> permissions = new ArrayList<>();
+	List<FunctionalityAccessProfileDTO> permissions = new ArrayList<>();
 	
 	public AccessProfileDTO(AccessProfile accessProfile) {
 		this.id = accessProfile.getId();
 		this.name = accessProfile.getName();
 		this.description = accessProfile.getDescription();
 		for (AccessProfileHasFunctionality fpDto : accessProfile.getAccessProfileHasFunctionalities()) {
-			this.permissions.add(new FunctionalityPermissionDTO(fpDto.getFunctionality().getId(), fpDto.getFunctionality().getName(), fpDto.getReadPermission(), fpDto.getWritePermission()));
+			this.permissions.add(new FunctionalityAccessProfileDTO(fpDto.getAccessProfile().getId(), fpDto.getAccessProfile().getName(), fpDto.getAccessProfile().getDescription(), fpDto.getFunctionality().getId(), fpDto.getFunctionality().getName(), fpDto.getWritePermission(), fpDto.getReadPermission()));
 		}
 	}
 	

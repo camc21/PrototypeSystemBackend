@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import br.com.carlos.dto.LoginDTO;
@@ -35,8 +37,8 @@ public class Login implements Serializable {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "user_name", unique = true)
-	private String userName;
+	@Column(name = "email")
+	private String email;
 
 	@Column(name = "password")
 	private String password;
@@ -52,8 +54,11 @@ public class Login implements Serializable {
 
 	@Column(name = "enabled")
 	private Boolean enabled;
+	
+	@OneToOne(fetch = FetchType.EAGER, mappedBy = "login")
+    private UserEntity userEntity;
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
 	@JoinTable(name = "login_has_access_profile", joinColumns = {
 	@JoinColumn(name = "login_id") }, inverseJoinColumns = { 
 	@JoinColumn(name = "access_profile_id") })
@@ -67,9 +72,9 @@ public class Login implements Serializable {
 		return roles;
 	}
 
-	public Login(Long id, String userName, String password, String description) {
+	public Login(Long id, String email, String password, String description) {
 		this.id = id;
-		this.userName = userName;
+		this.email = email;
 		this.password = password;
 		List<AccessProfile> accessProfiles = new ArrayList<>();
 		accessProfiles.add(new AccessProfile(description));
@@ -78,7 +83,7 @@ public class Login implements Serializable {
 
 	public Login(LoginDTO loginDto) {
 		this.id = loginDto.getId();
-		this.userName = loginDto.getUsername();
+		this.email = loginDto.getEmail();;
 		this.password = loginDto.getPassword();
 		List<AccessProfile> accessProfiles = new ArrayList<>();
 		for (String descriptionProfile : loginDto.getPermissions()) {

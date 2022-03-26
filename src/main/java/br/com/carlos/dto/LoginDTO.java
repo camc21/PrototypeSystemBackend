@@ -17,15 +17,15 @@ public class LoginDTO implements Serializable {
 
 	private Long id;
 
-	private String username;
+	private String email;
 
 	private String password;
 	
 	private List<String> permissions;
 	
-	public LoginDTO(Long id, String userName, String password, String description) {
+	public LoginDTO(Long id, String email, String password, String description) {
 		this.id = id;
-		this.username = userName;
+		this.email = email;
 		this.password = password;
 		List<String> permissions = new ArrayList<>();
 		permissions.add(description);

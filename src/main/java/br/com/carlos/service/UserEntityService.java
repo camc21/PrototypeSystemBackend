@@ -1,6 +1,7 @@
 package br.com.carlos.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,16 +15,21 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import br.com.carlos.dto.UserEntityDTO;
-import br.com.carlos.interfaces.InterfaceCrud;
+import br.com.carlos.dto.ComboBoxDTO;
+import br.com.carlos.dto.UserEntityLoginDTO;
+import br.com.carlos.exception.ResourceNotFoundException;
 import br.com.carlos.model.UserEntity;
 import br.com.carlos.repository.UserEntityRepository;
 
 @Service
-public class UserEntityService implements InterfaceCrud<UserEntityDTO> {
+public class UserEntityService {
 
 	@Autowired
-	UserEntityRepository userEntityRepository;
+	private UserEntityRepository userEntityRepository;
+	
+	@Autowired
+	private AccessProfileService accessProfileService;
+	
 	
 	public record Listagem(List<UserEntity> animes, long quantidade) {
 	}
@@ -38,10 +44,16 @@ public class UserEntityService implements InterfaceCrud<UserEntityDTO> {
 	}
 	
 	@PreAuthorize("hasAuthority('REGISTER_USER_ENTITY_READING')")
-	public Page<UserEntityDTO> findAllPage(Integer pageNo, Integer pageSize, String sortBy) {
+	public Page<UserEntityLoginDTO> findAllPage(Integer pageNo, Integer pageSize, String sortBy) {
 		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-		Page<UserEntityDTO> userEntityList = userEntityRepository.findAllPage(paging);
+		Page<UserEntityLoginDTO> userEntityList = userEntityRepository.findAllPage(paging);
 		if (!userEntityList.isEmpty()) {
+			for (UserEntityLoginDTO uel : userEntityList) {
+				List<ComboBoxDTO> accessProfiles = accessProfileService.findComboBoxByIdLogin(uel.getIdLogin());
+				String accessProfileAux = getAccessProfilesText(accessProfiles);
+				uel.setAccessProfileList(accessProfiles);
+				uel.setAccessProfilesText(accessProfileAux);
+			}
 			return userEntityList;
 		}
 		return null;
@@ -54,25 +66,39 @@ public class UserEntityService implements InterfaceCrud<UserEntityDTO> {
 				userEntity.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado")));
 	}
 
-	@Override
 	@PreAuthorize("hasAuthority('REGISTER_USER_ENTITY_WRITING')")
-	public void save(UserEntityDTO userEntityDto) {
-		UserEntity userEntity = new UserEntity.Builder().id(userEntityDto.getId()).name(userEntityDto.getName())
-				.email(userEntityDto.getEmail()).build();
-		userEntityRepository.save(userEntity);
+	public void save(UserEntityLoginDTO userEntityLoginDto) {
+		UserEntity user = new  UserEntity();
+		user.create(userEntityLoginDto);
+		userEntityRepository.save(user);
 	}
 
-	@Override
 	@PreAuthorize("hasAuthority('REGISTER_USER_ENTITY_WRITING')")
-	public void update(UserEntityDTO userEntityDto) {
-		UserEntity userEntity = findById(userEntityDto.getId()).get();
-		userEntity.updateUserEntity(userEntityDto);
-		userEntityRepository.save(userEntity);
+	public void update(UserEntityLoginDTO userEntityLoginDto) {
+		Optional<UserEntity> userEntity = findById(userEntityLoginDto.getIdUserEntity());
+		if(userEntity.isPresent()) {
+			userEntity.get().update(userEntityLoginDto, userEntity.get());
+		} else {
+			throw new ResourceNotFoundException("Usuário não encontrado");
+		}
+		userEntityRepository.save(userEntity.get());
 	}
 
-	@Override
 	@PreAuthorize("hasAuthority('REGISTER_USER_ENTITY_WRITING')")
 	public void delete(Long id) {
 		userEntityRepository.deleteById(id);
+	}
+	
+	private String getAccessProfilesText(List<ComboBoxDTO> accessProfilesDto) {
+		Iterator<ComboBoxDTO> iterator = accessProfilesDto.iterator();
+		String accessProfileText = "";
+		while(iterator.hasNext()) {
+			ComboBoxDTO element = iterator.next();
+			accessProfileText += element.getLabel();
+			if(iterator.hasNext()) {
+				accessProfileText += " / ";
+			}
+		}
+		return accessProfileText;
 	}
 }

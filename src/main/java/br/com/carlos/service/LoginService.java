@@ -19,7 +19,7 @@ public class LoginService {
 		this.loginRepository = loginRepository;
 	}
 
-	public Login findByUserName(String userName) {
-		return loginRepository.findByUserName(userName);
+	public Login findByUserName(String email) {
+		return loginRepository.findByEmail(email);
 	}
 }

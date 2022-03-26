@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import br.com.carlos.dto.UserEntityDTO;
+import br.com.carlos.dto.UserEntityLoginDTO;
 import br.com.carlos.model.UserEntity;
 import br.com.carlos.service.UserEntityService;
 
@@ -45,12 +45,12 @@ public class UserEntityController {
 	}
 
 	@GetMapping("/page")
-	public ResponseEntity<Page<UserEntityDTO>> findAllPage(
+	public ResponseEntity<Page<UserEntityLoginDTO>> findAllPage(
 			@RequestParam(defaultValue = "0") Integer pageNo, 
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "name") String sortBy) {
 		try {
-			Page<UserEntityDTO> userEntityList = userEntityService.findAllPage(pageNo, pageSize, sortBy);
+			Page<UserEntityLoginDTO> userEntityList = userEntityService.findAllPage(pageNo, pageSize, sortBy);
 			return ResponseEntity.ok().body(userEntityList);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
@@ -71,9 +71,9 @@ public class UserEntityController {
 
 	@Transactional
 	@PostMapping
-	public void postUserEntity(@RequestBody UserEntityDTO userEntityDto) {
+	public void postUserEntity(@RequestBody UserEntityLoginDTO userEntityLoginDto) {
 		try {
-			userEntityService.save(userEntityDto);
+			userEntityService.save(userEntityLoginDto);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);
@@ -82,9 +82,9 @@ public class UserEntityController {
 
 	@Transactional
 	@PutMapping
-	public void putUserEntity(@RequestBody UserEntityDTO userEntityDto) {
+	public void putUserEntity(@RequestBody UserEntityLoginDTO userEntityLoginDto) {
 		try {
-			userEntityService.update(userEntityDto);
+			userEntityService.update(userEntityLoginDto);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);
@@ -92,10 +92,10 @@ public class UserEntityController {
 	}
 
 	@Transactional
-	@DeleteMapping("/{id}")
-	public void deleteUserEntity(@PathVariable Long id) {
+	@DeleteMapping("/{idUserEntity}")
+	public void deleteUserEntity(@PathVariable Long idUserEntity) {
 		try {
-			userEntityService.delete(id);
+			userEntityService.delete(idUserEntity);
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);

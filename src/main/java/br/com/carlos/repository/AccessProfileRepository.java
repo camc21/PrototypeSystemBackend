@@ -45,6 +45,13 @@ List<FunctionalityAccessProfileDTO> retrievePermissionsForIdLogin(@Param("idLogi
 			+ " FROM AccessProfile ap")
 	List<ComboBoxDTO> comboBox();
 	
+	@Query("SELECT new br.com.carlos.dto.ComboBoxDTO(ap.id, ap.name)"
+	+ " FROM Login l"
+	+ " inner join l.accessProfiles ap"
+	+ " WHERE l.id = :idLogin")
+	public List<ComboBoxDTO> findComboBoxByIdLogin(@Param("idLogin") Long idLogin);
+	
+	
 //	@Query("SELECT f.id" + " FROM AccessProfileHasFunctionalities aphf" + " INNER JOIN aphf.accessProfile ap"
 //			+ " JOIN aphf.functionality f" + " WHERE ap.id = :idProfile")
 //	List<Long> findIdsFromFunctionalitiesForIdProfile(@Param("idProfile") Long idProfile);

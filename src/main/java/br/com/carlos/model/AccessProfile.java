@@ -14,7 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import br.com.carlos.dto.AccessProfileDTO;
-import br.com.carlos.dto.FunctionalityPermissionDTO;
+import br.com.carlos.dto.FunctionalityAccessProfileDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,13 +47,13 @@ public class AccessProfile implements Serializable {
 		this.id = dto.getId();
 		this.name = dto.getName();
 		this.description = dto.getDescription();
-		for (FunctionalityPermissionDTO fpDto : dto.getPermissions()) {
+		for (FunctionalityAccessProfileDTO fpDto : dto.getPermissions()) {
 			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality();
-			accessProfileHasFunctionality.setId(new AccessProfileFunctionalityKey(dto.getId(), fpDto.getId()));
+			accessProfileHasFunctionality.setId(new AccessProfileFunctionalityKey(fpDto.getAccessProfileId(), fpDto.getFunctonalityId()));
 			accessProfileHasFunctionality.setAccessProfile(new AccessProfile(dto.getId()));
-			accessProfileHasFunctionality.setFunctionality(new Functionality(fpDto.getId()));
-			accessProfileHasFunctionality.setReadPermission(fpDto.getReadingPermission());
-			accessProfileHasFunctionality.setWritePermission(fpDto.getWritingPermission());
+			accessProfileHasFunctionality.setFunctionality(new Functionality(fpDto.getFunctonalityId()));
+			accessProfileHasFunctionality.setReadPermission(fpDto.getReadPermission());
+			accessProfileHasFunctionality.setWritePermission(fpDto.getWritePermission());
 			this.accessProfileHasFunctionalities.add(accessProfileHasFunctionality);
 		}
 	}

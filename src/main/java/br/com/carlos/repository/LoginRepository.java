@@ -13,8 +13,8 @@ public interface LoginRepository extends JpaRepository<Login, Long> {
 	
 	@Query("SELECT l"
 			+ " FROM Login l"
-			+ " WHERE l.userName = :userName")
-	Login findByUserName(@Param("userName") String userName);
+			+ " WHERE l.email = :email")
+	Login findByEmail(@Param("email") String email);
 	
 	@Query("SELECT"
 			+ " new br.com.carlos.model.AccessProfile(ap.description)"
@@ -24,7 +24,7 @@ public interface LoginRepository extends JpaRepository<Login, Long> {
 	List<AccessProfile> findProfilesByIdLogin(@Param("idLogin") Long idLogin);
 	
 	@Query("SELECT"
-			+ " new br.com.carlos.model.Login(l.id, l.userName, l.password, ap.description)"
+			+ " new br.com.carlos.model.Login(l.id, l.email, l.password, ap.description)"
 			+ "	FROM Login l"
 			+ " INNER JOIN l.accessProfiles ap"
 			+ " WHERE l.id = :idLogin")

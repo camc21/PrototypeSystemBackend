@@ -7,7 +7,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import br.com.carlos.dto.FunctionalityAccessProfileDTO;
-import br.com.carlos.dto.FunctionalityPermissionDTO;
 import br.com.carlos.interfaces.InterfaceCrud;
 import br.com.carlos.model.AccessProfileHasFunctionality;
 import br.com.carlos.repository.AccessProfileHasFunctionalityRepository;
@@ -19,7 +18,7 @@ public class AccessProfileHasFunctionalityService implements InterfaceCrud<Funct
 	private AccessProfileHasFunctionalityRepository accessProfileHasFunctionalityRepository;
 	
 	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
-	public List<FunctionalityPermissionDTO> findFunctionalityPermissionListDto(Long id) {
+	public List<FunctionalityAccessProfileDTO> findFunctionalityPermissionListDto(Long id) {
 		return accessProfileHasFunctionalityRepository.findFunctionalityPermissionListDtoByIdAccessProfile(id);
 	}
 	

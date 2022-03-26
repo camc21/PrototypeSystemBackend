@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,23 +41,24 @@ public class AuthController {
 	public ResponseEntity signin(@RequestBody AccountCredentialsVO data) {
 		
 		try {
-			var username =data.getUsername();
+			BCryptPasswordEncoder by = new BCryptPasswordEncoder();
+			var email = data.getEmail();
 			var password = data.getPassword();
 
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 
-			var user = repository.findByUserName(username);
+			var user = repository.findByEmail(email);
 
 			var token = "";
 
 			if (user != null) {
-				token = jwtTokenProvider.createToken(username, user.getRoles());
+				token = jwtTokenProvider.createToken(email, user.getRoles());
 			} else {
-				throw new UsernameNotFoundException("username " + username + "not found");
+				throw new UsernameNotFoundException("email " + email + "not found");
 			}
 
 			Map<Object, Object> model = new HashMap<>();
-			model.put("username", username);
+			model.put("email", email);
 			model.put("token", token);
 			return ResponseEntity.ok().body(model);
 
