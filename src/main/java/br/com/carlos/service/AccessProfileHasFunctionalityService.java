@@ -26,6 +26,11 @@ public class AccessProfileHasFunctionalityService implements InterfaceCrud<Funct
 	public void saveAll(List<AccessProfileHasFunctionality> list) {
 		accessProfileHasFunctionalityRepository.saveAll(list);
 	}
+	
+	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_WRITING')")
+	public void deleteAll(List<AccessProfileHasFunctionality> list) {
+		accessProfileHasFunctionalityRepository.deleteAll(list);
+	}
 
 	@Override
 	public void save(FunctionalityAccessProfileDTO dto) {

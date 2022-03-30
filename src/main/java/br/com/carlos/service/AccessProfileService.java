@@ -19,6 +19,7 @@ import br.com.carlos.dto.ComboBoxDTO;
 import br.com.carlos.dto.FunctionalityAccessProfileDTO;
 import br.com.carlos.interfaces.InterfaceCrud;
 import br.com.carlos.model.AccessProfile;
+import br.com.carlos.model.AccessProfileFunctionalityKey;
 import br.com.carlos.model.AccessProfileHasFunctionality;
 import br.com.carlos.model.Functionality;
 import br.com.carlos.repository.AccessProfileRepository;
@@ -46,7 +47,7 @@ public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 		Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 		Page<AccessProfileDTO> accessProfileList = accessProfileRepository.findAllPage(paging);
 		for (AccessProfileDTO ap : accessProfileList) {
-			ap.setPermissions(accessProfileRepository.retrievePermissionsForIdLogin(ap.getId()));
+			ap.setPermissions(accessProfileRepository.loadPermissionsByIdAccessProfile(ap.getId()));
 		}
 		if (!accessProfileList.isEmpty()) {
 			return accessProfileList;
@@ -57,11 +58,10 @@ public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
 	public Optional<AccessProfileDTO> findById(Long id) {
 		Optional<AccessProfile> accessProfile = accessProfileRepository.findById(id);
-		Optional<AccessProfileDTO> accessProfileDto = Optional.of(new AccessProfileDTO(accessProfile.get()));
+		Optional<AccessProfileDTO> accessProfileDto = Optional.ofNullable(new AccessProfileDTO(accessProfile.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil de Acesso não encontrado"))));
 		List<FunctionalityAccessProfileDTO> findFunctionalityPermissionListDto =  accessProfileHasFunctionalityService.findFunctionalityPermissionListDto(id);
 		accessProfileDto.get().setPermissions(findFunctionalityPermissionListDto);
-		return Optional.ofNullable(accessProfileDto.orElseThrow(
-				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil de Acesso não encontrado")));
+		return accessProfileDto;
 	}
 	
 	@PreAuthorize("hasAuthority('REGISTER_ACCESS_PROFILE_READING')")
@@ -94,13 +94,30 @@ public class AccessProfileService implements InterfaceCrud<AccessProfileDTO> {
 		accessProfile.setName(accessProfileDto.getName());
 		accessProfile.setDescription(accessProfileDto.getDescription());
 		accessProfile = accessProfileRepository.save(accessProfile);
-		List<AccessProfileHasFunctionality> accessProfileHasFunctionalityList = new ArrayList<>();
+		List<FunctionalityAccessProfileDTO> accessProfileHasFunctionalityListCurrent = accessProfileRepository.loadPermissionsByIdAccessProfile(accessProfileDto.getId());
+		List<AccessProfileHasFunctionality> auxList = new ArrayList<>();
+		List<AccessProfileHasFunctionality> accessProfileHasFunctionalityListRemove = new ArrayList<>();
+		for (FunctionalityAccessProfileDTO fa : accessProfileHasFunctionalityListCurrent) {
+			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality(new AccessProfile(fa.getAccessProfileId()), new Functionality(fa.getFunctonalityId()), fa.getReadPermission(), fa.getWritePermission());
+			accessProfileHasFunctionality.setId(new AccessProfileFunctionalityKey(accessProfileHasFunctionality.getAccessProfile().getId(), accessProfileHasFunctionality.getFunctionality().getId()));
+			auxList.add(accessProfileHasFunctionality);
+		}
+		
+		List<AccessProfileHasFunctionality> accessProfileHasFunctionalityListAdd = new ArrayList<>();
 		for (int i = 0; i < accessProfileDto.getPermissions().size(); i++) {
 			Functionality functionality = new Functionality(accessProfileDto.getPermissions().get(i).getFunctonalityId());
 			AccessProfileHasFunctionality accessProfileHasFunctionality = new AccessProfileHasFunctionality(accessProfile, functionality, accessProfileDto.getPermissions().get(i).getReadPermission(), accessProfileDto.getPermissions().get(i).getWritePermission());
-			accessProfileHasFunctionalityList.add(accessProfileHasFunctionality);
+			accessProfileHasFunctionalityListAdd.add(accessProfileHasFunctionality);
 		}
-		accessProfileHasFunctionalityService.saveAll(accessProfileHasFunctionalityList);
+		
+		for (AccessProfileHasFunctionality aphf : auxList) {
+			if(!accessProfileHasFunctionalityListAdd.contains(aphf)) {
+				accessProfileHasFunctionalityListRemove.add(aphf);
+			}
+		}
+		
+		accessProfileHasFunctionalityService.deleteAll(accessProfileHasFunctionalityListRemove);
+		accessProfileHasFunctionalityService.saveAll(accessProfileHasFunctionalityListAdd);
 	}
 
 	@Override

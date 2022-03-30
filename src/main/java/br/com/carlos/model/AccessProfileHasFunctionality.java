@@ -70,15 +70,15 @@ public class AccessProfileHasFunctionality {
 		if (getClass() != obj.getClass())
 			return false;
 		AccessProfileHasFunctionality other = (AccessProfileHasFunctionality) obj;
-		return Objects.equals(accessProfile, other.accessProfile) && Objects.equals(functionality, other.functionality)
-				&& Objects.equals(id, other.id) && Objects.equals(readPermission, other.readPermission)
-				&& Objects.equals(writePermission, other.writePermission);
+		return Objects.equals(id, other.id);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(accessProfile, functionality, id, readPermission, writePermission);
+		return Objects.hash(id);
 	}
+
+	
     
     
 

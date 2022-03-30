@@ -40,7 +40,7 @@ public class AccessProfile implements Serializable {
 	@Column(name = "description")
 	private String description;
 	
-	@OneToMany(mappedBy = "accessProfile", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
+	@OneToMany(mappedBy = "accessProfile", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<AccessProfileHasFunctionality> accessProfileHasFunctionalities = new ArrayList<>();
 	
 	public AccessProfile(AccessProfileDTO dto) {

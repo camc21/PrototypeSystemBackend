@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.carlos.dto.AccessProfileDTO;
 import br.com.carlos.dto.ComboBoxDTO;
+import br.com.carlos.exception.ResourceNotFoundException;
 import br.com.carlos.model.AccessProfile;
 import br.com.carlos.service.AccessProfileService;
 
@@ -46,10 +47,8 @@ public class AccessProfileController {
 	}
 
 	@GetMapping("/page")
-	public ResponseEntity<Page<AccessProfileDTO>> findAllPage(
-			@RequestParam(defaultValue = "0") Integer pageNo, 
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "name") String sortBy) {
+	public ResponseEntity<Page<AccessProfileDTO>> findAllPage(@RequestParam(defaultValue = "0") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "name") String sortBy) {
 		try {
 			Page<AccessProfileDTO> accessProfilePage = accessProfileService.findAllPage(pageNo, pageSize, sortBy);
 			return ResponseEntity.ok().body(accessProfilePage);
@@ -67,6 +66,8 @@ public class AccessProfileController {
 		} catch (AccessDeniedException ade) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN.value(),
 					"Usuário não tem permissão para essa funcionalidade!", null);
+		} catch (ResourceNotFoundException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Perfil de Acesso não encontrado!", null);
 		}
 	}
 
@@ -102,7 +103,7 @@ public class AccessProfileController {
 					"Usuário não tem permissão para essa funcionalidade!", null);
 		}
 	}
-	
+
 	@GetMapping("/comboboxAccessProfile")
 	public ResponseEntity<List<ComboBoxDTO>> comboBox() {
 		try {
